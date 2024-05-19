@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='onfon-sms-sender',
-    version='0.1.2',
-    packages=find_packages(),
+    version='0.1.3',
+    packages=find_packages(include=['sms_sender', 'sms_sender.*']),
     install_requires=[
         'requests',
         'python-dotenv',],
