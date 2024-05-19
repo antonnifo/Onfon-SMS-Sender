@@ -4,12 +4,37 @@ import time
 from dotenv import load_dotenv
 import os
 
+# Attempt to import Django settings
 try:
-    from django.conf import settings
+    from django.conf import settings as django_settings
 except ImportError:
-    pass
+    django_settings = None
+
+# Attempt to import Flask app configuration
+try:
+    from flask import current_app as flask_app
+except ImportError:
+    flask_app = None
 
 load_dotenv()  # Load environment variables from .env file
+
+
+def get_config_value(key, default=None):
+    """
+    Get configuration value from environment variables, Django settings, or Flask settings.
+
+    Args:
+        key (str): The configuration key to look for.
+        default: The default value to return if the key is not found.
+
+    Returns:
+        The configuration value.
+    """
+    if flask_app and key in flask_app.config:
+        return flask_app.config[key]
+    if django_settings and hasattr(django_settings, key):
+        return getattr(django_settings, key)
+    return os.getenv(key, default)
 
 
 def send_sms(recipients, message):
@@ -17,7 +42,7 @@ def send_sms(recipients, message):
     Sends SMS messages to a list of recipients using the Onfon Media API.
 
     The function first checks for environment variables. If they are not found,
-    it falls back to using settings from the Django settings module.
+    it falls back to using settings from Flask or Django.
 
     Args:
         recipients (list of str): List of phone numbers to send the message to.
@@ -30,12 +55,11 @@ def send_sms(recipients, message):
     Raises:
         ValueError: If the required configuration settings are missing.
     """
-    api_url = os.getenv('SMS_API_URL', getattr(settings, 'SMS_API_URL', None))
-    client_id = os.getenv('SMS_CLIENT_ID', getattr(
-        settings, 'SMS_CLIENT_ID', None))
-    api_key = os.getenv('SMS_API_KEY', getattr(settings, 'SMS_API_KEY', None))
-    sender_id = os.getenv('SMS_SENDER_ID', getattr(
-        settings, 'SMS_SENDER_ID', None))
+    api_url = get_config_value(
+        'SMS_API_URL', 'https://api.onfonmedia.co.ke/v1/sms/SendBulkSMS')
+    client_id = get_config_value('SMS_CLIENT_ID', 'your_client_id_here')
+    api_key = get_config_value('SMS_API_KEY', 'your_api_key_here')
+    sender_id = get_config_value('SMS_SENDER_ID', 'Aqila-Alert')
 
     missing_settings = []
     if not api_url:
