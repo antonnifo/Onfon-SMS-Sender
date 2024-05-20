@@ -30,7 +30,7 @@ You can set these variables either as environment variables or in your applicati
 ## Usage
 
 ```python
-from onfon_sms_sender import send_sms
+from sms_sender import send_sms
 
 recipients = []  # comma separated  List of string recipient phone numbers in format ["254...", "07.."]
 message = "Hello, this is a test message from Onfon Media API"
@@ -44,7 +44,7 @@ You can set up your Flask application to use the `send_sms` function as shown be
 `app.py`
 ```python
 from flask import Flask
-from onfon_sms_sender import send_sms
+from sms_sender import send_sms
 
 app = Flask(__name__)
 app.config['SMS_API_URL'] = 'https://api.onfonmedia.co.ke/v1/sms/SendBulkSMS'
@@ -79,7 +79,7 @@ Use the `send_sms` function in your Django views:
 
 ```python
 from django.http import JsonResponse
-from onfon_sms_sender import send_sms
+from sms_sender import send_sms
 
 def send_sms_view(request):
     recipients = []  # comma separated  List of string recipient phone numbers in format ["254...", "07.."]
